@@ -1,0 +1,8 @@
+#EC2 hosts list
+
+[webservers]
+ws1 ansible_host= IP_SERVER_1
+ws2 ansible_host= IP_SERVER_2
+
+[local]
+control ansible_connection=local

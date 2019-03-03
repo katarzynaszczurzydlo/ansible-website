@@ -1,0 +1,132 @@
+Parameters:
+  EC2KeyPair:
+    Description: Choose an existing EC2 KeyPair.
+    Type: AWS::EC2::KeyPair::KeyName
+  EC2TagName:
+    Description: Choose a tag for your EC2 instances.
+    Type: String
+Mappings:
+  RegionMap:
+    us-east-2:
+      AMI: ami-0cd3dfa4e37921605
+    us-east-1:
+      AMI: ami-0080e4c5bc078760e
+    us-west-1:
+      AMI: ami-0799ad445b5727125
+    us-west-2:
+      AMI: ami-01e24be29428c15b2
+    ap-south-1:
+      AMI: ami-0937dcc711d38ef3f
+    ap-northeast-2:
+      AMI: ami-018a9a930060d38aa
+    ap-southeast-1:
+      AMI: ami-04677bdaa3c2b6e24
+    ap-southeast-2:
+      AMI: ami-0c9d48b5db609ad6e
+    ap-northeast-1:
+      AMI: ami-0d7ed3ddb85b521a6
+    ca-cental-1:
+      AMI: ami-0de8b8e4bc1f125fe
+    eu-central-1:
+      AMI: ami-0eaec5838478eb0ba
+    eu-west-1:
+      AMI: ami-08935252a36e25f85
+    eu-west-2:
+      AMI: ami-0664a710233d7c148
+    eu-west-3:
+      AMI: ami-0854d53ce963f69d8
+    eu-north-1:
+      AMI: ami-6d27a913
+    sa-east-1:
+      AMI: ami-0b04450959586da29
+Resources:
+  WebServer1:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      KeyName: !Ref EC2KeyPair
+      ImageId:
+        Fn::FindInMap:
+        - RegionMap
+        - !Ref AWS::Region
+        - AMI
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ !Ref EC2TagName, 'WebServer1'] ]
+      SecurityGroups:
+        - !Ref SecurityGroupWS
+  WebServer2:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      KeyName: !Ref EC2KeyPair
+      ImageId:
+        Fn::FindInMap:
+        - RegionMap
+        - !Ref AWS::Region
+        - AMI
+      Tags:
+        - Key: Name
+          Value: !Join [ '-', [ !Ref EC2TagName, 'WebServer2'] ]
+      SecurityGroups:
+        - !Ref SecurityGroupWS
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Properties:
+      AvailabilityZones:
+        Fn::GetAZs: ""
+      Instances:
+      - Ref: WebServer1
+      - Ref: WebServer2
+      Listeners:
+      - LoadBalancerPort: '80'
+        InstancePort: '80'
+        Protocol: HTTP
+      HealthCheck:
+        Target: HTTP:80/
+        HealthyThreshold: "3"
+        UnhealthyThreshold: "5"
+        Interval: "30"
+        Timeout: "5"
+
+  SecurityGroupWS:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow user to SSH to EC2 servers
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: Initial ansible setup
+        - Key: Description
+          Value: SSH and HTTP user access
+
+  ElasticIpWS1:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref WebServer1
+  ElasticIpWS2:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref WebServer2
+Outputs:
+  PublicIpWebServer1:
+    Description: PublicIP address for WebServer1
+    Value: !GetAtt
+      - WebServer1
+      - PublicIp
+  PublicIpWebServer2:
+      Description: PublicIP address for WebServer2
+      Value: !GetAtt
+      - WebServer2
+      - PublicIp
+  DNSLink:
+    Description: Website link
+    Value: !Sub 'http://${LoadBalancer.DNSName}'

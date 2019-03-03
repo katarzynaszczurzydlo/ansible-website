@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Simple website</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div class="jumbotron text-center">
+  <h1>Simple Website</h1>
+  <p>Created using CloudFormation and Ansible</p>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-6">
+      <h3>CloudFormation</h3>
+      <p>Infrastructure was set up using simple CloudFormation template.</p>
+      <p>The template creates two Ec2 instances and a LoadBalancer.</p>
+    </div>
+    <div class="col-sm-6">
+      <h3>Ansible</h3>
+      <p>Ansible was used to install packages and upload the webpage</p>
+      <p>To make it work you need to provide path to your private_key_file in ansible.cfg and
+        change the webservers PublicIP addresses in hosts-dev file to your Ec2 instances created via CloudFormation template.
+      </p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

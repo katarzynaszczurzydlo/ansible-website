@@ -1,0 +1,10 @@
+galaxy_info:
+  author: Katarzyna Szczurzydlo
+  description: Simple ansible playbook to setting up ec2 instances and uploading static webpage.
+
+  min_ansible_version: 2.4
+
+  
+  galaxy_tags: []
+
+  dependencies: []

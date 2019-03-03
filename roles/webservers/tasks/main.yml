@@ -1,0 +1,22 @@
+# tasks file for webservers
+---
+
+  - name: install yum
+    yum:
+      name: "*"
+      state: latest
+
+  - name: Installing packages
+    yum:
+      name:
+       - httpd
+      state: present
+
+  - name: Ensuring that apache starts
+    service: name=httpd state=started enabled=yes
+
+  - name:  Upload webpage
+    copy:
+      src: ../files/index.html
+      dest: "{{ webserver_path }}"
+      mode: 0755
